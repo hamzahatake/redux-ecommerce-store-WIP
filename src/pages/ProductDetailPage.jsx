@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 import { getProductById } from "../api/Products";
 import { useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addItem } from "../store/cartSlice";
 
 export default function SpecificProduct() {
+    const dispatch = useDispatch();
+
     const [product, setProduct] = useState('');
     const [isLoading, setLoading] = useState(false);
     const [hasError, setError] = useState(null);
@@ -93,7 +97,8 @@ export default function SpecificProduct() {
                         </p>
 
                         {/* Add to Cart Button */}
-                        <button className="w-full h-fit sm:w-auto px-6 py-5 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 transition">
+                        <button className="w-full h-fit sm:w-auto px-6 py-5 bg-indigo-600 text-white font-medium rounded-md 
+                        hover:bg-indigo-700 transition" onClick={() => dispatch(addItem(product))}>
                             Add to Cart
                         </button>
                     </div>
