@@ -1,109 +1,78 @@
-import { useState, useEffect } from "react";
-import { getProductById } from "../api/Products";
 import { useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { addItem } from "../store/cartSlice";
+import { useGetProductByIdQuery } from "../store/productsSlice";
+import { useDispatch } from "react-redux";
+import LoadingSpinner from "../components/Loading";
 
 export default function SpecificProduct() {
-    const dispatch = useDispatch();
-
-    const [product, setProduct] = useState('');
-    const [isLoading, setLoading] = useState(false);
-    const [hasError, setError] = useState(null);
-
     const { id } = useParams();
-
-    const selectedProduct = async (id) => {
-        setLoading(true);
-        try {
-            const theProduct = await getProductById(id);
-            setProduct(theProduct);
-            setError(null);
-        } catch (err) {
-            setError(err.message);
-            return [];
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        selectedProduct(id)
-    }, [id]);
-
+    const { data: product, isLoading, error } = useGetProductByIdQuery(id);
+    const dispatch = useDispatch();
 
     if (isLoading) {
         return (
-            <div className="fixed inset-0 flex justify-center items-center bg-transparent z-50">
-                <div className="spinner"></div>
-                <style>
-                    {`
-                @keyframes spinner {
-                    to {transform: rotate(360deg);}
-                }
-                .spinner {
-                    width: 48px;
-                    height: 48px;
-                    border: 6px solid #fff3;
-                    border-top-color: #fff;
-                    border-radius: 50%;
-                    animation: spinner 0.8s linear infinite;
-                }
-                `}
-                </style>
+            <div className="flex inset-0">
+                <LoadingSpinner />
             </div>
         );
     }
 
-    if (hasError) {
-        return <p className="text-red-400 text-center mt-10">{hasError}</p>;
+    if (error) {
+        return <p className="text-red-400 text-center mt-10">{error}</p>;
     }
 
     return (
-        <div className="w-screen h-160 mt-10">
+        <div className="pt-24 pb-24 bg-gray-50 min-h-screen">
             {product && (
-                <div className="bg-gray-50 rounded-2xl max-w-5xl ml-80 h-160 grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div className="max-w-3xl my-10 mx-auto px-4 min-h-[500px] flex flex-col justify-center">
+                    <div className="flex flex-col md:flex-row gap-8 bg-white rounded-lg shadow-lg p-6">
 
-                    {/* Product Image */}
-                    <div className="w-full content-center overflow-hidden rounded-lg">
-                        <img
-                            src={product?.image}
-                            alt={product?.title}
-                            className="object-cover w-full h-fit rounded-lg shadow-md"
-                        />
-                    </div>
+                        {/* Product Image */}
+                        <div className="flex-shrink-0 w-full md:w-1/2">
+                            <img
+                                src={product?.image}
+                                alt={product?.title}
+                                className="w-full h-auto object-cover rounded-lg"
+                            />
+                        </div>
 
-                    {/* Product Info */}
-                    <div className="border h-full flex flex-col justify-center">
+                        {/* Product Info */}
+                        <div className="flex-1 flex flex-col justify-between">
 
-                        {/* Category */}
-                        <span className="text-sm text-gray-500 uppercase tracking-wide mb-2">
-                            {product?.category}
-                        </span>
+                            <div>
+                                {/* Category */}
+                                <span className="text-sm text-gray-500 uppercase tracking-wide">
+                                    {product?.category}
+                                </span>
 
-                        {/* Title */}
-                        <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
-                            {product?.title}
-                        </h1>
+                                {/* Title */}
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mt-2">
+                                    {product?.title}
+                                </h1>
 
-                        {/* Price */}
-                        <p className="text-xl text-indigo-600 font-semibold mb-6">
-                            ${product?.price}
-                        </p>
+                                {/* Price */}
+                                <p className="text-xl text-green-600 font-semibold mt-4">
+                                    ${product?.price}
+                                </p>
 
-                        {/* Description */}
-                        <p className="text-gray-700 text-base leading-relaxed mb-8">
-                            {product?.description}
-                        </p>
+                                {/* Description */}
+                                <p className="text-gray-700 mt-4">
+                                    {product?.description}
+                                </p>
+                            </div>
 
-                        {/* Add to Cart Button */}
-                        <button className="w-full h-fit sm:w-auto px-6 py-5 bg-indigo-600 text-white font-medium rounded-md 
-                        hover:bg-indigo-700 transition" onClick={() => dispatch(addItem(product))}>
-                            Add to Cart
-                        </button>
+                            {/* Add to Cart Button */}
+                            <button
+                                onClick={() => dispatch(addItem(product))}
+                                className="mt-6 w-full md:w-auto bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700 transition-colors duration-300"
+                            >
+                                Add to Cart
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
         </div>
+
     );
 }

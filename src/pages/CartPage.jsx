@@ -1,6 +1,8 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { updateQuantity } from "../store/cartSlice";
+import { updateQuantity, deleteItem } from "../store/cartSlice";
+import checkOutPage from "./CheckoutPage";
+import { Link } from "react-router-dom";
 
 export default function Cart() {
 
@@ -12,8 +14,8 @@ export default function Cart() {
     }, 0);
 
     return (
-        <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-10">
-            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-8">
+        <div className="w-screen h-screen bg-gray-50 flex justify-center px-4 py-10">
+            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-8 mx-auto my-auto">
                 {/* Header */}
                 <h1 className="text-3xl font-semibold text-gray-800 mb-8">
                     Your Cart
@@ -57,6 +59,11 @@ export default function Cart() {
                                         }))}>
                                         +
                                     </button>
+                                    <button
+                                        className="px-2 py-1 text-gray-200 hover:text-white"
+                                        onClick={() => dispatch(deleteItem({ id: item.id }))}>
+                                        Del
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -71,9 +78,12 @@ export default function Cart() {
                     <div className="text-gray-700 text-xl font-semibold">
                         Total: ${total.toFixed(2)}
                     </div>
-                    <button className="bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                    {items.length >= 1 ? <Link
+                        to="/checkout"
+                        className="bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
                         Proceed to Checkout
-                    </button>
+                    </Link> : null}
+
                 </div>
             </div>
         </div>
